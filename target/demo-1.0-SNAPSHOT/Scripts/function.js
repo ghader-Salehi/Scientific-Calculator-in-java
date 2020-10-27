@@ -1,7 +1,7 @@
 const checkForDuplicateOperations = function(input , operation){
     const lastWord = input.slice(input.length-1 , input.length)
-    
-    if( isNaN(parseInt(lastWord)) )
+
+    if( isNaN(parseInt(lastWord)) && lastWord !==')')
         return true
     else
         return false
@@ -10,73 +10,104 @@ const checkForDuplicateOperations = function(input , operation){
 const activeAdditionalButtons = function(){
     for (const op of OPERATORS) {
         document.querySelector(`.more-buttons-shown[op=${op}]`).onclick = (e) =>
-              opCallback(op);
-      }
+            opCallback(op);
+
+    }
 }
-// ['Sin' , 'Cos' , 'Tan' , 'Cot' ,'Sinh' , 'Cosh' , 'Tanh' , 'Coth','ln' , 'log' , 'ePx' , 'xP2', 'xPy','GHx' , 'Fx' , 'TwoPx' , 'e', 'p' , 'Sqrt', 'oneDIVx' ]
+// ['Sin' , 'Cos' , 'Tan' , 'Cot' ,'ln' , 'log' , 'ePx' , 'xP2', 'xPy','GHx' , 'Fx' , 'TwoPx' , 'e', 'p' , 'Sqrt', 'oneDIVx' ]
 
 const opCallback  = function(op){
     switch (op) {
-        case 'Sin':
-            input.value = Math.sin(parseInt(input.value))
+        case 'sin':
+            Manage_other_operators_parenthesis('sin(',true)
             break;
-        case 'Cos':
-            console.log('Cos');
-            break;  
-        case 'Tan':
-            console.log('Tan');
-            break;     
-        case 'Cot':
-            console.log('Cot');
-            break;    
-        case 'Sinh':
-            console.log('Sinh');
+        case 'cos':
+            Manage_other_operators_parenthesis('cos(',true)
             break;
-        case 'Cosh':
-            console.log('Cosh');
-            break;  
-        case 'Tanh':
-            console.log('Tanh');
-            break;     
-        case 'Coth':
-            console.log('Coth');
-            break; 
+        case 'tan':
+            Manage_other_operators_parenthesis('tan(',true)
+            break;
+        case 'cot':
+            Manage_other_operators_parenthesis('cot(',true)
+            break;
         case 'ln':
-            console.log('ln');
+            Manage_other_operators_parenthesis('ln(',true)
             break;
         case 'log':
-            console.log('log');
-            break;  
+            Manage_other_operators_parenthesis('log(',true)
+            break;
         case 'ePx':
-            console.log('ePx');
-            break;     
+            Manage_other_operators_parenthesis('e^(',true)
+            break;
         case 'xP2':
-            console.log('xP2');
-            break;    
+            if(input.value !=='0'){
+                input.value += '^(2)'
+            }
+            else{
+                alert('invalid format used')
+                input.value = 0
+                Parenthesis_Index = 0
+            }
+            break;
         case 'xPy':
-            console.log('xPy');
+            if(input.value !=='0'){
+                Parenthesis_Index++
+                input.value += '^('
+            }
+            else{
+                alert('invalid format used')
+                input.value = 0
+                Parenthesis_Index = 0
+            }
             break;
         case 'GHx':
-            console.log('GHx');
-            break;  
+            Manage_other_operators_parenthesis('abs(',true)
+            break;
         case 'Fx':
-            console.log('Fx');
-            break;     
+            if(input.value !=='0'){
+                input.value += '!'
+            }
+            else{
+                alert('invalid format used')
+                input.value = 0
+                Parenthesis_Index = 0
+            }
+            break;
         case 'TwoPx':
-            console.log('TwoPx');
-            break; 
+            Manage_other_operators_parenthesis('2^(',true)
+            break;
         case 'e':
-            console.log('e');
+            if(input.value !=='0'){
+                if(checkLastChar(input.value.charAt(input.value.length-1)))
+                    input.value += '2.7182818285'
+                else
+                    input.value += '*2.7182818285'
+            }
+            else{
+
+                input.value = '2.7182818285'
+
+            }
             break;
         case 'p':
-            console.log('p');
-            break;  
+            if(input.value !=='0'){
+                if(checkLastChar(input.value.charAt(input.value.length-1)))
+                    input.value += '3.1415926536'
+                else
+                    input.value += '*3.1415926536'
+            }
+            else{
+
+                input.value = '3.1415926536'
+
+            }
+            break;
         case 'Sqrt':
-            console.log('Sqrt');
-            break;     
+            Manage_other_operators_parenthesis('sqrt(',true)
+            break;
         case 'oneDIVx':
-            console.log('oneDIVx');
-            break;     
+            Manage_other_operators_parenthesis('1/',false)
+            break;
         default:
             break;
     }
@@ -85,3 +116,69 @@ const opCallback  = function(op){
 const compute = function(){
     return eval(input.value)
 }
+
+const checkLastChar = (ch)=>{
+    for (const op of Main_Operators) {
+        if(ch === op)
+            return true
+    }
+    return false
+}
+// || has english words
+const ManageParenthesisForMainOperators = (CurrentValue)=>{
+    if((!isNaN(CurrentValue.charAt(CurrentValue.length-1)) ||
+        CurrentValue.charAt(CurrentValue.length-1) ===')' ||
+        isWord(CurrentValue)) &&
+        Parenthesis_Index !==0 &&
+        CurrentValue !=="0"){
+        Parenthesis_Swich = true
+        Parenthesis_Index--
+    }
+    if(!Parenthesis_Swich){
+        if( input.value !=='0'){
+            if(CurrentValue.charAt(CurrentValue.length-1) !=='(' &&
+                !checkLastChar(CurrentValue.charAt(CurrentValue.length-1)) ){
+                input.value +='*('
+                Parenthesis_Index++
+            }
+            else{
+                input.value +='('
+                Parenthesis_Index++
+            }
+
+        }
+        else {
+            input.value = '('
+            Parenthesis_Index++
+        }
+    }
+    else{
+        input.value +=')'
+        Parenthesis_Swich = false
+    }
+}
+
+
+const Manage_other_operators_parenthesis = (operator,hasParethesis)=>{
+    if(hasParethesis) Parenthesis_Index++
+    if(input.value !=='0'){
+        input.value += operator
+    }
+    else{
+        input.value = operator
+    }
+}
+const isWord = (CurrentValue)=>{
+    let reg = new RegExp(/[a-z]/)
+    if(reg.test(CurrentValue.charAt(CurrentValue.length - 1)))
+        return true
+
+}
+
+
+
+
+
+
+
+
